@@ -12,6 +12,7 @@ const EDITIONS = ['Enterprise', 'Professional', 'Community', 'BuildTools']
 const YEARS = ['2022', '2019', '2017']
 
 const VsYearVersion = {
+    '2026': '18.0',
     '2022': '17.0',
     '2019': '16.0',
     '2017': '15.0',
@@ -112,7 +113,7 @@ function isPathVariable(name) {
 
 function filterPathValue(path) {
     let paths = path.split(';')
-    // Remove duplicates by keeping the first occurance and preserving order.
+    // Remove duplicates by keeping the first occurrence and preserving order.
     // This keeps path shadowing working as intended.
     function unique(value, index, self) {
         return self.indexOf(value) === index

@@ -12,10 +12,10 @@ jobs:
     name: release
     runs-on: windows-latest
     steps:
-      - name: Setup Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@release/v1
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+      - name: Setup Developer Command Prompt
+        uses: ./
       - name: Compile and run some C code
         shell: cmd
         run: |
@@ -26,6 +26,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - run: npm audit --audit-level=moderate --production
       - run: npm audit --audit-level=critical

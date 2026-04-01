@@ -4,6 +4,7 @@
   "description": "GitHub Action to setup Developer Command Prompt for Microsoft Visual C++",
   "main": "index.js",
   "scripts": {
+    "build": "ncc build -m index.js -o dist",
     "lint": "eslint index.js"
   },
   "repository": {
@@ -30,6 +31,7 @@
     "@actions/core": "^1.10.0"
   },
   "devDependencies": {
-    "eslint": "^7"
+    "eslint": "^9",
+    "@vercel/ncc": "^0.38.3"
   }
 }

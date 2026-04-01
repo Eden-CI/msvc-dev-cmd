@@ -5,17 +5,32 @@ on:
   push:
     branches:
       - master
+      - dev
+      - main
       - release/*
   schedule:
     - cron: '0 6 * * *'
 
 jobs:
   test:
-    name: default
-    runs-on: windows-latest
+    name: default (${{ matrix.runner }}, VS ${{ matrix.vsversion }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2022
+            vsversion: "2022"
+            supports_arm32: true
+          - runner: windows-2025
+            vsversion: "2022"
+            supports_arm32: true
+          - runner: windows-2025-vs2026
+            vsversion: "2026"
+            supports_arm32: false
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download Internet
         run: npm install
       - name: Run eslint
@@ -24,6 +39,7 @@ jobs:
         uses: ./
         with:
           arch: amd64
+          vsversion: ${{ matrix.vsversion }}
       - name: Compile and run some C code (amd64)
         shell: cmd
         run: |
@@ -33,50 +49,64 @@ jobs:
         uses: ./
         with:
           arch: amd64_x86
+          vsversion: ${{ matrix.vsversion }}
       - name: Compile and run some C code (x86)
         shell: cmd
         run: |
           cl.exe hello.c
           hello.exe
       - name: Enable Developer Command Prompt (amd64_arm)
+        if: matrix.supports_arm32
         uses: ./
         with:
           arch: amd64_arm
+          vsversion: ${{ matrix.vsversion }}
       - name: Compile some C code (arm)
+        if: matrix.supports_arm32
         shell: cmd
         run: |
-          cl.exe hello.c
-          dumpbin /headers hello.exe
+          cl.exe /c hello.c
+          dumpbin /headers hello.obj
       - name: Enable Developer Command Prompt (amd64_arm64)
         uses: ./
         with:
           arch: amd64_arm64
+          vsversion: ${{ matrix.vsversion }}
       - name: Compile some C code (arm64)
         shell: cmd
         run: |
-          cl.exe hello.c
-          dumpbin /headers hello.exe
+          cl.exe /c hello.c
+          dumpbin /headers hello.obj
   audit:
     name: npm audit
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - run: npm install
       - run: npm audit --audit-level=moderate --production
       - run: npm audit --audit-level=critical
   alias-arch:
-    name: arch aliases
-    runs-on: windows-latest
+    name: arch aliases (${{ matrix.runner }}, VS ${{ matrix.vsversion }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2022
+            vsversion: "2022"
+          - runner: windows-2025
+            vsversion: "2022"
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download Internet
         run: npm install
       - name: Enable Developer Command Prompt
         uses: ./
         with:
           arch: Win32
+          vsversion: ${{ matrix.vsversion }}
       - name: Compile and run some C code
         shell: cmd
         run: |
